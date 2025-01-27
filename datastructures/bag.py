@@ -65,4 +65,5 @@ class Bag(IBag[T]):
     def clear(self) -> None:
         ''' Removes all items from the bag. '''
         for item in self.contents:
-            self.remove(item)
+            while self.contents[item] > 0:
+                self.remove(item)
