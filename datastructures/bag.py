@@ -33,7 +33,6 @@ class Bag(IBag[T]):
 
     def count(self, item: T) -> int:
         ''' Returns the count of a given item. '''
-        ## THIS NEEDS TO BE IMPLEMENTED BEFORE ADD AND IT SHOULD NOT
         try: self.contents[item]
         except: 
             if item == None:
@@ -64,7 +63,6 @@ class Bag(IBag[T]):
 
     def clear(self) -> None:
         ''' Removes all items from the bag. '''
-        ## Shouldn't there be a test for an item count of more than 1?
         for item in self.contents:
             while self.contents[item] > 0:
                 self.remove(item)
