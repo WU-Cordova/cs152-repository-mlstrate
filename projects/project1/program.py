@@ -1,19 +1,14 @@
-from bag.py import Bag
+from typing import Iterable, Optional
+from datastructures.ibag import IBag, T
+from datastructures.bag import Bag
+from projects.project1.cards import Card, MultiDeck
+from projects.project1.game_logic import Game
+from copy import deepcopy
+import random
 
 def main():
-    ## TESTING ONLY
-    test = Bag()
-    test.add(item1)
-    test.add(item1)
-    test.add(item2)
-    test.add(item3)
-    print("Added item1, item1, item2, item3.")
-    print(f"Distinct items: {test.distinct_items()}")
-    print(f"item1 count: {test.count(item1)}")
-    test.remove(item3)
-    print("item3 removed.")
-    test.clear()
-    print(f"Distinct items: {test.distinct_items()}")
+    blackjack = Game()
+    blackjack.play()
 
 
 if __name__ == '__main__':

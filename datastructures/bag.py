@@ -28,6 +28,8 @@ class Bag(IBag[T]):
             raise TypeError("Cannot remove NoneType item")
         elif item not in self.contents:
             raise ValueError("Item not in bag")
+        elif self.contents[item] == 1:
+            del self.contents[item]
         else:
             self.contents[item] -= 1
 
@@ -63,6 +65,4 @@ class Bag(IBag[T]):
 
     def clear(self) -> None:
         ''' Removes all items from the bag. '''
-        for item in self.contents:
-            while self.contents[item] > 0:
-                self.remove(item)
+        self.contents.clear()
