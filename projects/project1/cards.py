@@ -32,10 +32,11 @@ class Card:
             # the symbol players will see (e.g. "J\u2660")
 
     def __hash__(self):
-        return hash((self.symbol, self.suit, self.value))
+        return hash((self.symbol, self.suit, self.value))   # had to make this to fix an 'unhashable' error
 
     def __eq__(self, other_card) -> bool:
-        # other card is Card type
+        ''' Returns whether a card has the same suit and value (face) as another. '''
+        # other card is Card type but it wouldn't let me typehint it from inside the Card class
         if other_card is None:
             return False
         return self.symbol == other_card.symbol
@@ -44,6 +45,7 @@ class Card:
 class MultiDeck(Bag):    # need to make this a child of Bag eventually
     
     def __init__(self) -> None:
+        ''' Creates a bag of cards consisting of multiple 52-card decks. '''
         num_decks = random.choice(poss_deck_num)    
             # choose number of decks to play with
         self.contents = {}     # initialize bag of cards
@@ -66,6 +68,7 @@ class MultiDeck(Bag):    # need to make this a child of Bag eventually
         return items
 
     def draw_random_card(self) -> Card:
+        ''' Draws a random card from the deck and returns it so it can be placed into a hand. '''
         drawn_card = random.choice(list(self.contents.keys()))
         card_copy = deepcopy(drawn_card)
         self.remove(drawn_card)

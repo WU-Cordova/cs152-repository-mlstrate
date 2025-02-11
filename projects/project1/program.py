@@ -7,6 +7,7 @@ from copy import deepcopy
 import random
 
 def main():
+    ''' Initializes a game of Blackjack. '''
     blackjack = Game()
     blackjack.play()
 
