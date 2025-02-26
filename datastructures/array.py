@@ -48,51 +48,95 @@ class Array(IArray[T]):
 
     @overload
     def __getitem__(self, index: slice) -> Sequence[T]: ...
+    
     def __getitem__(self, index: int | slice) -> T | Sequence[T]:
         if isinstance(index, int):          # if index
-            return self.__elements[index]
+            return self.__elements[index].item() if isinstance(self.__elements[index], np.generic) else self.__elements[index]
         elif isinstance(index, slice):      # if slice
-            return [elem for elem in self.__elements[index]]
+            return Array([elem.item() if isinstance(elem, np.generic) else elem for elem in self.__elements[index]], data_type = self.__data_type)
         else:
             raise TypeError("Argument must be an index or a slice.")
       
+
     def __setitem__(self, index: int, item: T) -> None:
         if not isinstance(item, self.__data_type):
             raise TypeError("Item is not an instance of the specified data type.")
         self.__elements[index] = item
 
-    ##
+    def grow_array(self) -> None:
+        if self.__element_count == self.__capacity:     # if array has reached capacity, double capacity
+            self.__capacity *= 2
+            new_array = np.empty(self.__capacity, dtype = self.__data_type)  # create new empty array
+
+            for i in range(len(self)):              # copy over elements
+                new_array[i] = deepcopy(self[i])
+            self.__elements = deepcopy(new_array)  
+
+
     def append(self, data: T) -> None:
         if not isinstance(data, self.__data_type):
             raise TypeError("Item is not an instance of the array's specified data type.")
 
-        ## CREATE EMPTY ARRAY OF DOUBLED SIZE
-        new_size = np.empty(2 * self.__capacity, dtype = self.__data_type)
+        self.grow_array()   # will grow array if needed
 
-        ## ADD ELEMENTS
-        for i in range(len(self)):              # add previous elements
-            new_size[i] = deepcopy(self[i])
-        new_size[len(self)] = deepcopy(data)    # append new element
-        self.__elements = deepcopy(new_size)    # update self.__elements
-        
-        ## UPDATE COUNTS
+        ## APPEND ELEMENT
         self.__element_count += 1
-        self.__capacity = len(self)
+        self[len(self) - 1] = deepcopy(data)    # append new element
+        self.__elements = deepcopy(self)    # update self.__elements
 
-        print("test")
-        print(repr(self))
-        # raise NotImplementedError('Append not implemented.')
-
-
+    
     def append_front(self, data: T) -> None:
-        raise NotImplementedError('Append front not implemented.')
+        if not isinstance(data, self.__data_type):
+            raise TypeError("Item is not an instance of the array's specified data type.")
+
+        self.grow_array()   # will grow array if needed
+        
+        ## APPEND ELEMENT
+        for i in range(len(self)):   # shift everything forward 1 space, thereby leaving space for the element to be appended
+            self[i + 1] = deepcopy(self[i])
+        self[0] = deepcopy(data)    # append new element to first position
+        self.__element_count += 1
+        self.__elements = deepcopy(self)
+
+
+    def shrink_array(self) -> None:
+        if self.__element_count <= 0.25 * self.__capacity:  # check if capacity has outgrown elements
+            self.__capacity *= 0.5
+            new_array = np.empty(self.__capacity, dtype = self.__data_type)     # create empty array of new size
+
+            for i in range(len(self)):              # copy over elements
+                new_array[i] = deepcopy(self[i])
+            self.__elements = deepcopy(new_array)
+
 
     def pop(self) -> None:
-        raise NotImplementedError('Pop not implemented.')
+        popped = deepcopy(self[len(self) - 1])  # store the last element somewhere else before it's deleted
+
+        ## DELETE ELEMENT
+        self[len(self) - 1] = self.__data_type()   # replace element w/ generic version of the data type
+        self.__element_count -= 1
+        self.__elements = deepcopy(self)
+
+        self.shrink_array()     # shrink array if needed
+
+        return popped
+
     
     def pop_front(self) -> None:
-        raise NotImplementedError('Pop front not implemented.')
-    ##
+        popped = deepcopy(self[0])  # store the first element somewhere else before it's deleted
+
+        ## DELETE ELEMENT
+        for i in range(len(self)):   # shift everything back 1, thereby overwriting the first element
+            self[i - 1] = deepcopy(self[i])
+            # last element is now written twice - in its previous position and back 1 since nothing shifted back to overwrite it
+        self.__element_count -= 1
+        self[len(self) - 1] = self.__data_type()    # replace 2nd instance of last element w/ generic instance of data type
+        self.__elements = deepcopy(self)
+
+        self.shrink_array()     # shrink array if needed
+
+        return popped
+
 
     def __len__(self) -> int: 
         return(self.__element_count)
@@ -110,16 +154,30 @@ class Array(IArray[T]):
         rev = self.__elements[::-1]
         return(rev.__iter__())
 
-    ##
+
     def __delitem__(self, index: int) -> None:
-        raise NotImplementedError('Delete not implemented.')
+        for i in range(index, len(self) - 1):   # shift everything after the deleted item back 1, thereby overwriting the deleted item
+            self[i - 1] = self[i]
+        self.__element_count -= 1
+
+        if self.__element_count <= 0.25 * self.__capacity:  # check if capacity has outgrown elements
+            self.__capacity *= 0.5
+            new_array = np.empty(self.__capacity, dtype = self.__data_type)     # create empty array of new size
+            
+            for i in range(len(self)):              # copy over elements
+                new_array[i] = deepcopy(self[i])
+            self.__elements = deepcopy(new_array)
+
 
     def __contains__(self, item: Any) -> bool:
-        raise NotImplementedError('Contains not implemented.')
+        return item in self.__elements
+
 
     def clear(self) -> None:
-        raise NotImplementedError('Clear not implemented.')
-    ##
+        self.__element_count = 0
+        self.__capacity = 0
+        self.__elements = np.empty(self.__element_count, dtype = self.__data_type)
+        # raise NotImplementedError('Clear not implemented.')
 
     def __str__(self) -> str:
         return '[' + ', '.join(str(item) for item in self) + ']'

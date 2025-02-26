@@ -4,8 +4,6 @@ from datastructures.array import Array
 
 from tests.car import Car, Color, Make, Model
 
-# @suite_weight(1.0)
-# @suite_name('Array Test Suite')
 class TestArray:
     car1 = Car('123', Color.RED, Make.TOYOTA, Model.CAMRY)
     car2 = Car('456', Color.BLUE, Make.TOYOTA, Model.CIVIC)
@@ -35,9 +33,6 @@ class TestArray:
 
     def test_index_operator_should_return_the_item_at_the_index_specified_of_the_array(self, setup_numerical_array: Array):
         assert setup_numerical_array[5] == 5
-
-    def test_index_operator_should_return_the_items_at_the_slice_specified_of_the_array(self, setup_numerical_array: Array):
-        assert setup_numerical_array[0:3] == [0, 1, 2]
     
     def test_index_operator_should_raise_an_IndexError_exception_if_the_index_is_out_of_bounds(self, setup_numerical_array: Array):
         with pytest.raises(IndexError):
@@ -107,16 +102,26 @@ class TestArray:
         assert len(setup_numerical_array) == 10
 
     def test_length_operator_should_return_the_length_of_the_array_plus_1_after_appending_an_item(self, setup_numerical_array: Array):
-        print("test")
         setup_numerical_array.append(10)
-        print("test again")
-        print(repr(setup_numerical_array))
         assert len(setup_numerical_array) == 11
 
     def test_append_method_appends_new_item_to_end_of_the_array(self, setup_numerical_array: Array):
         setup_numerical_array.append(10)
-        print(setup_numerical_array[len(setup_numerical_array) - 1])
         assert setup_numerical_array[len(setup_numerical_array) - 1] == 10
+
+    def test_append_front_method_appends_new_item_to_front_of_the_array(self, setup_numerical_array: Array):
+        setup_numerical_array.append_front(-1)
+        assert setup_numerical_array[0] == -1
+
+    def test_pop_should_return_and_delete_the_last_item_in_an_array(self, setup_numerical_array: Array):
+        test_array = setup_numerical_array.pop()
+        assert test_array == 9
+        assert len(setup_numerical_array) == 9
+    
+    def test_pop_front_should_return_and_delete_the_last_item_in_an_array(self, setup_numerical_array: Array):
+        test_array = setup_numerical_array.pop_front()
+        assert test_array == 0
+        assert len(setup_numerical_array) == 9
 
     def test_reverse_operator_should_reverse_the_array(self, setup_numerical_array: Array):
         expected = 9
@@ -133,10 +138,7 @@ class TestArray:
             setup_numerical_array[11] = 11
 
     def test_bracket_operator_should_return_a_slice_of_the_array_if_a_slice_is_passed_in(self, setup_numerical_array: Array):
-        print("np_array =", setup_numerical_array[1:5])
-        print("other_array =", Array([1, 2, 3, 4]))
         assert setup_numerical_array[1:5] == Array([1, 2, 3, 4])
-        ## ASK PROF. CORDOVA ABOUT THIS
 
     def test_constructor_should_raise_a_value_error_if_the_sequence_passed_in_is_not_a_sequence(self):
         with pytest.raises(ValueError):
