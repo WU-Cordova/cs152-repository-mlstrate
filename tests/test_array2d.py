@@ -95,16 +95,16 @@ class TestArray2D:
         with pytest.raises(ValueError):
             _ = Array2D([1, 2, 3], data_type = int)     # A list, but not a list of lists
 
-    # ✅ Test for TypeError if `starting_sequence` contains mixed types
+    # ✅ Test for ValueError if `starting_sequence` contains mixed types
     def test_init_mixed_types(self) -> None:
-        """Ensures a TypeError is raised if items in `starting_sequence` are of mixed types."""
-        with pytest.raises(TypeError):
+        """Ensures a ValueError is raised if items in `starting_sequence` are of mixed types."""
+        with pytest.raises(ValueError):
             _ = Array2D([[1, 2, "three"], [4, 5, 6]], data_type=int)  # Mixed types
 
-        with pytest.raises(TypeError):
+        with pytest.raises(ValueError):
             _ = Array2D([[1.0, 2.0, 3], [4, "five", 6]], data_type=float)  # Mixed types
 
-        with pytest.raises(TypeError):
+        with pytest.raises(ValueError):
             _ = Array2D([[1, 2, 3], ["four", "five", "six"]], data_type=str)  # Mixed row types
 
     # ✅ Test for ValueError if `starting_sequence` has inconsistent lengths

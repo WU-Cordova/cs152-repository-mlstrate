@@ -66,7 +66,7 @@ class Array2D(IArray2D[T]):
         for i in range(len(starting_sequence)):
             for j in range(len(starting_sequence[0])):
                 if not isinstance(starting_sequence[i][j], data_type):
-                    raise TypeError("All items must be instances of the specified data type.")
+                    raise ValueError("All items must be instances of the specified data type.")
 
         ## INITIALIZE ATTRIBUTES
         self.__data_type = data_type
