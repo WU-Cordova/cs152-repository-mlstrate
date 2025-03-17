@@ -48,9 +48,9 @@ class TestArray:
 
         assert array1 == array2
 
-    def test_non_equality_operator_should_return_true_for_valid_instances_containing_the_same_data(self, setup_numerical_array: Array, setup_complex_object_array: Array):
+    def test_non_equality_operator_should_return_true_for_valid_instances_containing_different_data(self, setup_numerical_array: Array, setup_complex_object_array: Array):
         array1 = setup_numerical_array
-        array2 = setup_complex_object_array
+        array2 = Array[int](starting_sequence=[2 for i in range(10)], data_type=int)
 
         assert array1 != array2
 

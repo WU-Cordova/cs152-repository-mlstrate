@@ -9,6 +9,7 @@ from datastructures.iarray import IArray
 from datastructures.array import Array
 from datastructures.iarray2d import IArray2D, T
 from datastructures.array2d import Array2D
+from projects.project2.cell import Cell
 from copy import deepcopy
 import random
 import time
@@ -22,56 +23,105 @@ class Grid(Array2D):
         for row in range(height):
             cells.append([])
             for col in range(width):
-                is_alive = random.choice([True, False])
-                cells[row].append(Cell(is_alive = is_alive))
+                cells[row].append(Cell())
+                cells[row][col].is_alive = random.choice([True, False])
+                
+                # Give the cell an idea of its position
+                cells[row][col].row = row
+                cells[row][col].col = col
+
+                '''
+                if row == 0:
+                    cells[row][col].touching_top = True
+                elif row == height - 1:
+                    cells[row][col].touching_bottom = True
+                if col == 0:
+                    cells[row][col].touching_left = True
+                elif col == width - 1:
+                    cells[row][col].touching_right = True
+                '''
 
         self.grid: Array2D = Array2D(starting_sequence = cells, data_type = Cell)
+        self.rows = height
+        self.cols = width
 
 
-    def display(self):
-        print(self.grid) # I don't think this is going to work
-
-    
-    def count_neighbors(self, row: int, col: int) -> None:
-        """
-        1. iterate through each cell
-        2. set each cell's num to grid.num_neighbors()
-        3. populate new grid
-        4. check for alternate or constant repeats
-            - if grid == last_grid or grid == last_grid - 1, stop
-        5. archive old grid in grid storage
-        6. set grid = new_grid
-        """
+    def __str__(self) -> str:
+        """ Creates a string representation of a grid that can be printed. """
+        string = ""
+        for row_idx in range(self.rows):
+            for cell in self.grid[row_idx]:
+                if cell.is_alive:
+                    string += "X"
+                else:
+                    string += "-"
+            string += "\n"
+        return string
 
 
-    def produce_next_gen():
-        pass
-        
+    def display(self) -> None:
+        print(str(self))
 
 
+    def __eq__(self, other: Grid) -> bool:
+        return str(self) == str(other)
 
-    kb = KBHit()
 
-    print('Hit any key, or ESC to exit.')
+    def count_neighbors(self) -> None:
+        '''
+        Where ** is the cell, the neighbors orientation is: 
 
-    iteration = 0
+        UL | UC | UR
+        ---+----+---
+        L  | ** | R
+        ---+----+---
+        DL | DC | DR
 
-    while True:
+        '''
 
-        print(f"In loop: {iteration}")
-        iteration += 1
-        time.sleep(1)
+        for row_idx in range(self.rows):        
+            for cell in self.grid[row_idx]:     # for each cell:
 
-        if kb.kbhit():
-            c = kb.getch()
-            c_ord = ord(c)
-            print(c)
-            print(c_ord)
-            time.sleep(2)
-            if c_ord == 27: # ESC
-                break
-            print(c)
+                ## CHECK TOP NEIGHBORS
+                if cell.row != 0:   # not touching top
+                    if self.grid[cell.row - 1][cell.col].is_alive:    # UC
+                        cell.neighbors += 1
+                    if cell.col != 0:   # not touching L side
+                        if self.grid[cell.row - 1][cell.col - 1].is_alive:  # UL
+                            cell.neighbors += 1
+                    if cell.col != self.cols - 1:   # not touching R side
+                        if self.grid[cell.row - 1][cell.col + 1].is_alive:  # UR
+                            cell.neighbors += 1
+                
+                ## CHECK SIDE NEIGHBORS
+                if cell.col != 0:   # not touching L side
+                    if self.grid[cell.row][cell.col - 1].is_alive:  # L
+                        cell.neighbors += 1
+                if cell.col != self.cols - 1:   # not touching R side
+                    if self.grid[cell.row][cell.col + 1].is_alive:  # R
+                        cell.neighbors += 1
 
+                ## CHECK BOTTOM NEIGHBORS
+                if cell.row != self.rows - 1:   # not touching bottom
+                    if self.grid[cell.row + 1][cell.col].is_alive:    # DC
+                        cell.neighbors += 1
+                    if cell.col != 0:   # not touching L side
+                        if self.grid[cell.row + 1][cell.col - 1].is_alive:  # DL
+                            cell.neighbors += 1
+                    if cell.col != self.cols - 1:   # not touching R side
+                        if self.grid[cell.row + 1][cell.col + 1].is_alive:  # DR
+                            cell.neighbors += 1
+
+
+    def produce_next_gen(self) -> None:
+        next_gen = Grid(self.cols, self.rows)
+        for row_idx in range(self.rows):
+                for col_idx in range(self.cols):     # for each cell:
+                    if self.grid[row_idx][col_idx].alive_next_gen():
+                        next_gen.grid[row_idx][col_idx].is_alive = True
+                    else:
+                        next_gen.grid[row_idx][col_idx].is_alive = False
+        self.grid = deepcopy(next_gen.grid)
     
 
 

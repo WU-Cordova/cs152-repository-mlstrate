@@ -113,4 +113,10 @@ class TestArray2D:
         with pytest.raises(ValueError):
             _ = Array2D([[1, 2, 3], [4, 5]], data_type=int)
 
+    # ✅ Test that __eq__ will correctly return equality
+    def test_eq_returns_correct_boolean(self, filled3x3: Array2D[int], empty3x3: Array2D[int]) -> None:
+        diff_filled = Array2D([[1, 3, 3], [4, 5, 6], [7, 8, 9]], data_type=int)
+        assert filled3x3 == filled3x3
+        assert filled3x3 != diff_filled
+
     

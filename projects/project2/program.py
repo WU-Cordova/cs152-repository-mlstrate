@@ -1,22 +1,21 @@
+## IMPORTS
+from __future__ import annotations
+import os
+from typing import Iterator, Sequence
 
+from datastructures.iarray import IArray
+from datastructures.array import Array
+from datastructures.iarray2d import IArray2D, T
+from datastructures.array2d import Array2D
+from projects.project2.cell import Cell
 from projects.project2.grid import Grid
 from projects.project2.gamecontroller import GameController
 
 
 def main():
-    
-    """
-    1. initialize first grid
-    2. set speed
-    3. initialize next generations at that speed
-    4. store 5 past grids in grid storage list
-    5. check for repeats
-    6. stop if there are repeats
-    """
 
-    grid = Grid(10, 10)
-    game_controller = GameController(grid)
-    game_controller.run(100)
+    game_controller = GameController()
+    game_controller.run(10, 5, 5)
 
 
 

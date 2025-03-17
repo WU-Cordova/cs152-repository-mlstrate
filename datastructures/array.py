@@ -43,6 +43,12 @@ class Array(IArray[T]):
             self.__elements[i] = deepcopy(starting_sequence[i])
 
 
+    def empty(elements: int=0, data_type: type=object) -> Array:
+        starting_sequence: List[T] = []
+        for elem in range(elements):
+            starting_sequence.append(data_type())
+        return Array(starting_sequence, data_type)
+
     @overload
     def __getitem__(self, index: int) -> T: ...
 

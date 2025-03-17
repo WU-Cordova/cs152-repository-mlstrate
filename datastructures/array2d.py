@@ -108,6 +108,10 @@ class Array2D(IArray2D[T]):
     
     def __len__(self): 
         return len(self.__array1d) // self.__row_len
+
+    def __eq__(self, other) -> bool:
+        return str(self) == str(other)
+        # return self.__array1d == other.__array1d
                                   
     def __str__(self) -> str: 
         return f'[{", ".join(f"{str(row)}" for row in self)}]'
