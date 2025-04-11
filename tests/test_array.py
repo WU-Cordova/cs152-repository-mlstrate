@@ -17,6 +17,11 @@ class TestArray:
     def setup_numerical_array(self) -> Array[int]:
         return Array[int](starting_sequence=[i for i in range(10)], data_type=int)
 
+    def test_adding_an_item_to_an_empty_array_will_work(self):
+        empty_array: Array[int] = Array.empty(elements = 1, data_type = int)
+        empty_array.append(1)
+        assert len(empty_array) >= 1
+
     def test_constructing_an_array_with_a_complex_object_should_deep_copy_the_complex_objects_data(self, setup_complex_object_array: Array[Car]):
         original_array = setup_complex_object_array
         
@@ -107,7 +112,8 @@ class TestArray:
 
     def test_append_method_appends_new_item_to_end_of_the_array(self, setup_numerical_array: Array):
         setup_numerical_array.append(10)
-        assert setup_numerical_array[len(setup_numerical_array) - 1] == 10
+        setup_numerical_array.append(11)
+        assert setup_numerical_array[len(setup_numerical_array) - 1] == 11
 
     def test_append_front_method_appends_new_item_to_front_of_the_array(self, setup_numerical_array: Array):
         setup_numerical_array.append_front(-1)

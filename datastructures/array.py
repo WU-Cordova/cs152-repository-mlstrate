@@ -19,13 +19,15 @@ from datastructures.iarray import IArray, T
 
 class Array(IArray[T]):  
 
-    def __init__(self, starting_sequence: Sequence[T]=[], data_type: type=object) -> None: 
+    def __init__(self, starting_sequence: Sequence[T], data_type: type=object) -> None: 
 
         ## ERRORS
         if not isinstance(starting_sequence, Sequence):
             raise ValueError("Starting sequence is not a valid sequence type.")
+        if starting_sequence == None:
+            raise ValueError("Must have a starting sequence. Try Array.empty() to initialize an empty array.")
         if not isinstance(data_type, type):
-            raise ValueError("Data type is not a valid type.")
+            raise ValueError(" Data type is not a valid type.")
         for i in range(len(starting_sequence)):
             if not isinstance(starting_sequence[i], data_type):
                 raise TypeError("An element of the starting sequence is not an instance of the specified data type.")
@@ -34,7 +36,7 @@ class Array(IArray[T]):
         self.__element_count = len(starting_sequence)   # logical size
         self.__capacity = len(starting_sequence)        # physical size (storage)
         self.__data_type = data_type
-        
+
         ## CREATE EMPTY ARRAY
         self.__elements = np.empty(self.__element_count, dtype = data_type)
 
@@ -43,7 +45,9 @@ class Array(IArray[T]):
             self.__elements[i] = deepcopy(starting_sequence[i])
 
 
-    def empty(elements: int=0, data_type: type=object) -> Array:
+    def empty(elements: int=1, data_type: type=object) -> Array:
+        if elements < 1:
+            raise ValueError("Element amount must be 1 or above. This will not affect the length of the array.")
         starting_sequence: List[T] = []
         for elem in range(elements):
             starting_sequence.append(data_type())
@@ -71,7 +75,10 @@ class Array(IArray[T]):
 
     def grow_array(self) -> None:
         if self.__element_count == self.__capacity:     # if array has reached capacity, double capacity
-            self.__capacity *= 2
+            if self.__capacity == 0:
+                self.__capacity == 1
+            else:
+                self.__capacity *= 2
             new_array = np.empty(self.__capacity, dtype = self.__data_type)  # create new empty array
 
             for i in range(len(self)):              # copy over elements
@@ -107,7 +114,7 @@ class Array(IArray[T]):
 
     def shrink_array(self) -> None:
         if self.__element_count <= 0.25 * self.__capacity:  # check if capacity has outgrown elements
-            self.__capacity *= 0.5
+            self.__capacity = self.__capacity // 2
             new_array = np.empty(self.__capacity, dtype = self.__data_type)     # create empty array of new size
 
             for i in range(len(self)):              # copy over elements
@@ -150,9 +157,8 @@ class Array(IArray[T]):
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Array):
             return False
-        else:
-            return self.__elements.all() == other.__elements.all()
-    
+        return self.__elements.all() == other.__elements.all()
+        
     def __iter__(self) -> Iterator[T]:
         return(self.__elements.__iter__())
 
@@ -184,6 +190,12 @@ class Array(IArray[T]):
         self.__capacity = 0
         self.__elements = np.empty(self.__element_count, dtype = self.__data_type)
         # raise NotImplementedError('Clear not implemented.')
+
+    def get_capacity(self) -> int:
+        return self.__capacity
+
+    def set_element_count(self, num: int) -> None:
+        self.__element_count = num
 
     def __str__(self) -> str:
         return '[' + ', '.join(str(item) for item in self) + ']'
