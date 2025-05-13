@@ -1,5 +1,13 @@
-import os
+from __future__ import annotations
 
+from collections.abc import Sequence
+import os
+from typing import Any, Iterator, overload
+import numpy as np
+from numpy.typing import NDArray
+from copy import deepcopy
+
+from datastructures.iarray import IArray, T
 from datastructures.array import Array, T
 from datastructures.istack import IStack
 
@@ -268,7 +276,10 @@ class ArrayStack(IStack[T]):
             Returns:
                 bool -- True if the item is in the stack, False otherwise.
         '''
-        raise NotImplementedError
+        for i in range(self.top_item_index + 1):
+            if self.array[i] == item:
+                return True
+        return False
 
     def __str__(self) -> str:
         ''' Returns a string representation of the stack.
@@ -284,7 +295,7 @@ class ArrayStack(IStack[T]):
             Returns:
                 str -- A string representation of the stack.
         '''
-        return str([self.stack[i] for i in range(self.top_item_index)])
+        return str([self.array[i] for i in range(self.top_item_index + 1)])
     
     def __repr__(self) -> str:
         ''' Returns a string representation of the stack.

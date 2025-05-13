@@ -157,7 +157,8 @@ class Array(IArray[T]):
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Array):
             return False
-        return self.__elements.all() == other.__elements.all()
+        #return self.__elements.all() == other.__elements.all()
+        return np.array_equal(self.__elements, other.__elements)
         
     def __iter__(self) -> Iterator[T]:
         return(self.__elements.__iter__())
@@ -193,6 +194,9 @@ class Array(IArray[T]):
 
     def get_capacity(self) -> int:
         return self.__capacity
+
+    def get_elements(self) -> NDArray:
+        return self.__elements
 
     def set_element_count(self, num: int) -> None:
         self.__element_count = num
