@@ -1,5 +1,12 @@
-from typing import Any
+from __future__ import annotations
+from collections.abc import Sequence
+import os
+from typing import Any, Iterator, overload
+import numpy as np
+from numpy.typing import NDArray
+from copy import deepcopy
 
+from datastructures.iarray import IArray, T
 from datastructures.array import Array
 from datastructures.iqueue import IQueue, T
 
@@ -31,7 +38,13 @@ class CircularQueue(IQueue[T]):
                 maxsize: The maximum size of the queue
                 data_type: The type of the elements in the queue
         '''
-        raise NotImplementedError
+        self.array = Array.empty(elements = maxsize, data_type = data_type)
+        self.max_size = maxsize
+        self.data_type = data_type
+        self.size = 0
+        self.f = 0      # index of front element
+        self.r = 0      # index directly past rear element
+
 
     def enqueue(self, item: T) -> None:
         ''' Adds an item to the rear of the queue
@@ -58,7 +71,15 @@ class CircularQueue(IQueue[T]):
             Raises:
                 IndexError: If the queue is full
         '''
-        raise NotImplementedError
+        if not isinstance(item, self.data_type):
+            raise TypeError(f'Item {self.item} is not an instance of data type {self.data_type}')
+        if self.size == self.maxsize:
+            raise IndexError('Queue is full')
+
+        self.array[self.r] = item
+        self.r = (self.r + 1) % self.maxsize
+        self.size += 1
+
 
     def dequeue(self) -> T:
         ''' Removes and returns the item at the front of the queue
@@ -85,7 +106,15 @@ class CircularQueue(IQueue[T]):
             Raises:
                 IndexError: If the queue is empty
         '''
-        raise NotImplementedError
+        if self.size == 0:
+            raise IndexError('Queue is empty')
+
+        item = self.array[self.f]
+        self.array[self.f] = self.data_type()   # replace item w/ generic instance of data type
+        self.f = (self.f + 1) % self.maxsize
+        self.size -= 1
+        return item
+
 
     def clear(self) -> None:
         ''' Removes all items from the queue 
@@ -103,7 +132,11 @@ class CircularQueue(IQueue[T]):
                 >>> q.rear
                 IndexError('Queue is empty')
         '''
-        raise NotImplementedError
+        self.array.clear()
+        self.f = -1
+        self.r = 0
+        self.size = 0
+        #raise NotImplementedError
 
     @property
     def front(self) -> T:
@@ -135,7 +168,7 @@ class CircularQueue(IQueue[T]):
             Raises:
                 IndexError: If the queue is empty
         '''
-        raise NotImplementedError
+        return self.array[self.f]
 
     @property
     def full(self) -> bool:
@@ -184,7 +217,9 @@ class CircularQueue(IQueue[T]):
             Returns:
                 True if the queue is full, False otherwise
         '''
-        raise NotImplementedError
+        if self.size == self.maxsize:
+            return True
+        return False
 
     @property
     def empty(self) -> bool:
@@ -232,7 +267,9 @@ class CircularQueue(IQueue[T]):
             Returns:
                 True if the queue is empty, False otherwise
         '''
-        raise NotImplementedError
+        if self.size == 0:
+            return True
+        return False
     
     @property
     def maxsize(self) -> int:
@@ -246,7 +283,8 @@ class CircularQueue(IQueue[T]):
             Returns:
                 The maximum size of the queue
         '''
-        raise NotImplementedError
+        return self.max_size
+        #raise NotImplementedError
 
     def __eq__(self, other: object) -> bool:
         ''' Returns True if this CircularQueue is equal to another object, False otherwise
@@ -279,7 +317,45 @@ class CircularQueue(IQueue[T]):
             Returns:
                 True if this CircularQueue is equal to another object, False otherwise
         '''
-        raise NotImplementedError   
+        if not isinstance(other, CircularQueue):
+            raise TypeError('Cannot compare CircularQueue to another data type')
+        if not isinstance(self.data_type, other.data_type):
+            return False
+        
+        array1 = []
+        array2 = []
+        # for i in range(self.f, (self.max_size - self.f + 1)):
+        #     if i < self.max_size:   # if index is from f to end of array
+        #         array1 += self.array[i]
+        #     else:   # loop around
+        #         j = 0
+        #         while j != self.f:
+        #             array1 += self.array[j]
+        #             j += 1
+        #     if i < self.max_size:
+        #         array1 += 
+        #     else:
+        #         array1 += self.data_type()
+
+        #     if i < (len(other.array) - 1):
+        #         array2 += other.array[i]
+        #     else:
+        #         array2 += other.data_type()
+
+        for i in range(self.f, max((self.max_size + self.f), (other.max_size + other.f))):
+            if i < (self.max_size + self.f):
+                array1 += self.array[i % self.max_size]
+            else:
+                array1 += self.data_type()
+        for i in range(other.f, max((self.max_size + self.f), (other.max_size + other.f))):
+            if i < (other.max_size + other.f):
+                array2 += other.array[i % other.max_size]
+            else:
+                array2 += other.data_type()
+        
+
+
+        #raise NotImplementedError   
     
     def __len__(self) -> int:
         ''' Returns the number of items in the queue
@@ -313,7 +389,8 @@ class CircularQueue(IQueue[T]):
             Returns:
                 The number of items in the queue
         '''
-        raise NotImplementedError
+        return self.size
+        #raise NotImplementedError
 
     def __str__(self) -> str:
         ''' Returns a string representation of the CircularQueue
@@ -345,5 +422,5 @@ class CircularQueue(IQueue[T]):
             Returns:
                 A string representation of the CircularQueue object
         '''
-        return f'ArrayQueue({repr(self.circularqueue)})'
+        return f'ArrayQueue({repr(self.array)})'
                                   

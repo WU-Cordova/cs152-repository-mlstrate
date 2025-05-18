@@ -27,6 +27,7 @@ class TestCircularQueue:
 
     def test_enqueue(self, empty_queue: CircularQueue):
         empty_queue.enqueue(1)
+        print(f"f = {empty_queue.f}, r = {empty_queue.r}")
         assert len(empty_queue) == 1
         assert empty_queue.front == 1
 
@@ -43,12 +44,17 @@ class TestCircularQueue:
         assert small_queue.empty is False
 
     def test_is_full(self, full_queue: CircularQueue):
+        print(f"size = {full_queue.size}, max size = {full_queue.maxsize}")
         assert full_queue.full is True
 
     def test_size(self, empty_queue: CircularQueue, small_queue: CircularQueue, full_queue: CircularQueue):
         assert len(empty_queue) == 0
         assert len(small_queue) == 3
         assert len(full_queue) == 5
+
+    def test_clear(self, full_queue: CircularQueue):
+        full_queue.clear()
+        assert full_queue == empty_queue()
 
     def test_equal_queues(self):
         q1 = CircularQueue(5)
